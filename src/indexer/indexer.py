@@ -230,7 +230,7 @@ def _load_gitignore(repo_path: Path) -> pathspec.PathSpec | None:
     gi = repo_path / ".gitignore"
     if gi.exists():
         patterns = gi.read_text(encoding="utf-8", errors="replace").splitlines()
-        return pathspec.PathSpec.from_lines("gitwildmatch", patterns)
+        return pathspec.PathSpec.from_lines("gitignore", patterns)
     return None
 
 

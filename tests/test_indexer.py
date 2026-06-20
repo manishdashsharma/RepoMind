@@ -1,15 +1,13 @@
 from __future__ import annotations
 
-import tempfile
 from pathlib import Path
 
 import tiktoken
-import pytest
 
-from repomind.core.indexer import (
-    _chunk,
-    _language,
-    _read,
+from repomind.indexer.indexer import (
+    _chunk_file,
+    _detect_language,
+    _read_safe,
     count_indexable_files,
     index_repository,
 )
@@ -21,22 +19,22 @@ def _enc() -> tiktoken.Encoding:
 
 class TestLanguageDetection:
     def test_python(self) -> None:
-        assert _language(Path("app.py")) == "python"
+        assert _detect_language(Path("app.py")) == "python"
 
     def test_typescript(self) -> None:
-        assert _language(Path("component.tsx")) == "typescript"
+        assert _detect_language(Path("component.tsx")) == "typescript"
 
     def test_unknown_extension(self) -> None:
-        assert _language(Path("file.xyz")) is None
+        assert _detect_language(Path("file.xyz")) is None
 
     def test_dockerfile_by_name(self) -> None:
-        assert _language(Path("Dockerfile")) == "dockerfile"
+        assert _detect_language(Path("Dockerfile")) == "dockerfile"
 
 
 class TestChunking:
     def test_small_file_is_one_chunk(self) -> None:
         content = "def hello():\n    return 'world'\n"
-        chunks = _chunk(content, "app.py", "python", _enc())
+        chunks = _chunk_file(content, "app.py", "python", _enc())
         assert len(chunks) == 1
         assert chunks[0]["file_path"] == "app.py"
         assert chunks[0]["language"] == "python"
@@ -45,18 +43,21 @@ class TestChunking:
     def test_chunk_ids_are_unique(self) -> None:
         lines = [f"line {i}\n" for i in range(200)]
         content = "".join(lines)
-        chunks = _chunk(content, "big.py", "python", _enc())
+        chunks = _chunk_file(content, "big.py", "python", _enc())
         ids = [c["chunk_id"] for c in chunks]
         assert len(ids) == len(set(ids))
 
     def test_empty_content_produces_no_chunks(self) -> None:
-        chunks = _chunk("   \n\n\n", "empty.py", "python", _enc())
+        chunks = _chunk_file("   \n\n\n", "empty.py", "python", _enc())
         assert chunks == []
 
     def test_overlap_means_last_line_of_prev_in_next(self) -> None:
-        lines = [f"{'x' * 30}\n" for _ in range(60)]
+        lines = [
+            f"variable_{i:04d} = 'long_string_value_for_test_{i:04d}'  # comment {i}\n"
+            for i in range(150)
+        ]
         content = "".join(lines)
-        chunks = _chunk(content, "f.py", "python", _enc())
+        chunks = _chunk_file(content, "f.py", "python", _enc())
         assert len(chunks) >= 2
         prev_end = chunks[0]["end_line"]
         next_start = chunks[1]["start_line"]
@@ -67,14 +68,14 @@ class TestFileReading:
     def test_reads_utf8(self, tmp_path: Path) -> None:
         f = tmp_path / "hello.py"
         f.write_text("print('नमस्ते')\n", encoding="utf-8")
-        content = _read(f)
+        content = _read_safe(f)
         assert content is not None
         assert "नमस्ते" in content
 
     def test_skips_large_file(self, tmp_path: Path) -> None:
         f = tmp_path / "large.py"
         f.write_bytes(b"x" * (2 * 1024 * 1024))
-        assert _read(f) is None
+        assert _read_safe(f) is None
 
 
 class TestIndexRepository:
