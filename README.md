@@ -1,13 +1,13 @@
 <div align="center">
 
-```
+<pre>
  ██████╗ ███████╗██████╗  ██████╗ ███╗   ███╗██╗███╗   ██╗██████╗
  ██╔══██╗██╔════╝██╔══██╗██╔═══██╗████╗ ████║██║████╗  ██║██╔══██╗
  ██████╔╝█████╗  ██████╔╝██║   ██║██╔████╔██║██║██╔██╗ ██║██║  ██║
  ██╔══██╗██╔══╝  ██╔═══╝ ██║   ██║██║╚██╔╝██║██║██║╚██╗██║██║  ██║
  ██║  ██║███████╗██║     ╚██████╔╝██║ ╚═╝ ██║██║██║ ╚████║██████╔╝
  ╚═╝  ╚═╝╚══════╝╚═╝      ╚═════╝ ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═════╝
-```
+</pre>
 
 **Ask your codebase anything — locally, privately, powerfully.**
 
@@ -352,24 +352,18 @@ A: Use `llama3.1:8b` or larger. Smaller models have limited multilingual support
 
 ## Author
 
-<table>
-  <tr>
-    <td align="center">
-      <a href="https://www.manishdashsharma.com/">
-        <b>Manish Dash Sharma</b>
-      </a>
-      <br />
-      <sub>Senior Software Engineer</sub>
-      <br /><br />
-      Architecting AI-powered systems that scale.<br />
-      From GenAI integrations to full-stack solutions —<br />
-      turning complex problems into elegant code.
-      <br /><br />
-      <a href="https://www.manishdashsharma.com/">🌐 Website</a> ·
-      <a href="https://github.com/manishdashsharma">GitHub</a>
-    </td>
-  </tr>
-</table>
+<div align="center">
+
+<a href="https://www.manishdashsharma.com/"><b>Manish Dash Sharma</b></a>
+<br />
+<sub>Senior Software Engineer</sub>
+<br /><br />
+Architecting AI-powered systems that scale.<br />
+From GenAI integrations to full-stack solutions — turning complex problems into elegant code.
+<br /><br />
+<a href="https://www.manishdashsharma.com/">🌐 Website</a> · <a href="https://github.com/manishdashsharma">GitHub</a>
+
+</div>
 
 ---
 

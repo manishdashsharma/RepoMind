@@ -75,11 +75,11 @@ class VectorStore:
             qfilter = Filter(
                 must=[FieldCondition(key="file_path", match=MatchValue(value=file_filter))]
             )
-        hits = self._client.search(
+        response = self._client.query_points(
             collection_name=name,
-            query_vector=vector,
-            limit=top_k,
+            query=vector,
             query_filter=qfilter,
+            limit=top_k,
             with_payload=True,
         )
         return [
@@ -91,7 +91,7 @@ class VectorStore:
                 end_line=int(str(h.payload["end_line"])),
                 score=h.score,
             )
-            for h in hits
+            for h in response.points
             if h.payload
         ]
 

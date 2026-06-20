@@ -2,6 +2,7 @@ from __future__ import annotations
 
 import hashlib
 from pathlib import Path
+from typing import Any
 
 import pathspec
 import tiktoken
@@ -137,7 +138,7 @@ def count_indexable_files(repo_path: Path) -> int:
     return sum(1 for f in _walk(repo_path, gitignore) if _detect_language(f))
 
 
-def _walk(repo_path: Path, gitignore: pathspec.PathSpec | None) -> list[Path]:
+def _walk(repo_path: Path, gitignore: pathspec.PathSpec[Any] | None) -> list[Path]:
     files: list[Path] = []
     for item in repo_path.rglob("*"):
         if not item.is_file():
@@ -226,7 +227,7 @@ def _make_chunk(
     }
 
 
-def _load_gitignore(repo_path: Path) -> pathspec.PathSpec | None:
+def _load_gitignore(repo_path: Path) -> pathspec.PathSpec[Any] | None:
     gi = repo_path / ".gitignore"
     if gi.exists():
         patterns = gi.read_text(encoding="utf-8", errors="replace").splitlines()

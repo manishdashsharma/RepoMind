@@ -49,7 +49,7 @@ def save_session(session: SessionData) -> Path | None:
     duration_secs = int((now - session.started_at).total_seconds())
     duration_str = _format_duration(duration_secs)
     filename = session.started_at.strftime("%Y-%m-%d_%H-%M-%S") + ".md"
-    out = SESSIONS_DIR / filename
+    out: Path = SESSIONS_DIR / filename
 
     lines: list[str] = [
         f"# RepoMind Session · {session.started_at.strftime('%Y-%m-%d %H:%M')}\n\n",
