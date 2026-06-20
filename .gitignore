@@ -1,0 +1,55 @@
+# Python
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+*.egg
+*.egg-info/
+dist/
+build/
+.eggs/
+.Python
+
+# uv / virtual envs
+.venv/
+venv/
+env/
+.env.local
+.python-version
+
+# Distribution
+dist/
+*.whl
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+
+# Type checking
+.mypy_cache/
+.ruff_cache/
+
+# RepoMind runtime data
+.repomind/
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+.DS_Store
+Thumbs.db
+
+# Session files (user-generated — not committed)
+sessions/
+
+# Docker volumes (if mounted locally)
+docker/volumes/
+
+# Secrets
+.env
+*.pem
+*.key

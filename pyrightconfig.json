@@ -1,0 +1,12 @@
+{
+  "pythonVersion": "3.11",
+  "pythonPlatform": "All",
+  "typeCheckingMode": "basic",
+  "useLibraryCodeForTypes": true,
+  "reportMissingImports": false,
+  "reportMissingModuleSource": false,
+  "extraPaths": ["src"],
+  "venvPath": ".",
+  "venv": ".venv",
+  "exclude": ["**/__pycache__", "**/.*", "tests/"]
+}
