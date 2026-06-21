@@ -59,7 +59,7 @@ def print_banner() -> None:
         )
     )
     console.print(
-        Align.center(Text("v0.1.0 · MIT · github.com/manishdashsharma/RepoMind", style="muted"))
+        Align.center(Text("v0.1.4 · MIT · github.com/manishdashsharma/RepoMind", style="muted"))
     )
     console.print()
 

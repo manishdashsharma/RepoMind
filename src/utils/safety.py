@@ -4,9 +4,8 @@ import os
 from dataclasses import dataclass, field
 from pathlib import Path
 
-_BLOCKED: frozenset[Path] = frozenset(
+_BLOCKED_TREES: frozenset[Path] = frozenset(
     {
-        Path("/"),
         Path("/etc"),
         Path("/usr"),
         Path("/bin"),
@@ -17,13 +16,14 @@ _BLOCKED: frozenset[Path] = frozenset(
         Path("/proc"),
         Path("/dev"),
         Path("/var"),
-        Path.home(),
         Path.home() / ".ssh",
         Path.home() / ".aws",
         Path.home() / ".gnupg",
         Path.home() / ".repomind",
     }
 )
+
+_BLOCKED_EXACT: frozenset[Path] = frozenset({Path("/"), Path.home()})
 
 _SENSITIVE_NAMES: frozenset[str] = frozenset(
     {
@@ -66,13 +66,21 @@ def validate_repo_path(repo_path: Path) -> PathReport:
     report = PathReport()
     resolved = repo_path.resolve()
 
-    for blocked in _BLOCKED:
+    for blocked in _BLOCKED_EXACT:
+        if resolved == blocked.resolve():
+            report.is_safe = False
+            report.block_reason = (
+                f"Indexing '{resolved}' is not allowed. Index a specific project folder instead."
+            )
+            return report
+
+    for blocked in _BLOCKED_TREES:
         try:
             resolved.relative_to(blocked.resolve())
             report.is_safe = False
             report.block_reason = (
                 f"Indexing '{resolved}' is not allowed. "
-                "System directories and your home directory are protected."
+                "System and sensitive directories are protected."
             )
             return report
         except ValueError:

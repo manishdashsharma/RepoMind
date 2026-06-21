@@ -110,6 +110,31 @@ _SKIP_DIRS: frozenset[str] = frozenset(
     }
 )
 
+_SKIP_FILES: frozenset[str] = frozenset(
+    {
+        "README.md",
+        "README.rst",
+        "README.txt",
+        "CONTRIBUTING.md",
+        "CONTRIBUTING.rst",
+        "CODE_OF_CONDUCT.md",
+        "CHANGELOG.md",
+        "CHANGELOG.rst",
+        "HISTORY.md",
+        "NOTICE.md",
+        "AUTHORS.md",
+        "SECURITY.md",
+        ".gitignore",
+        ".gitattributes",
+        ".editorconfig",
+        ".prettierrc",
+        ".eslintrc",
+        ".eslintignore",
+        ".npmignore",
+        "CLAUDE.md",
+    }
+)
+
 _MAX_FILE_BYTES: int = 1 * 1024 * 1024
 _CHUNK_TOKENS: int = 400
 _OVERLAP_TOKENS: int = 80
@@ -145,6 +170,8 @@ def _walk(repo_path: Path, gitignore: pathspec.PathSpec[Any] | None) -> list[Pat
             continue
         parts = item.relative_to(repo_path).parts
         if any(p in _SKIP_DIRS for p in parts):
+            continue
+        if item.name in _SKIP_FILES:
             continue
         if gitignore and gitignore.match_file(str(item.relative_to(repo_path))):
             continue

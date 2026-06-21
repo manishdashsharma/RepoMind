@@ -3,7 +3,7 @@ from __future__ import annotations
 import typer
 
 from repomind.cli.chat import run_chat
-from repomind.cli.install import run_install
+from repomind.cli.install import run_install, run_uninstall
 from repomind.config.settings import load_config, save_config
 from repomind.llm.ollama import LLMClient
 from repomind.retriever.qdrant import VectorStore
@@ -22,6 +22,11 @@ app = typer.Typer(
 @app.command("install", help="First-time setup: hardware detection, model pull, Qdrant start.")
 def install_command() -> None:
     run_install()
+
+
+@app.command("uninstall", help="Remove RepoMind container, data volume, and config.")
+def uninstall_command() -> None:
+    run_uninstall()
 
 
 @app.command("status", help="Check health of all RepoMind services.")
@@ -99,4 +104,11 @@ def main(ctx: typer.Context) -> None:
         success(f"[bold]{name}[/bold] is your RepoMind agent. Let's go!")
         console.print()
 
-    run_chat(config.agent_name)
+    try:
+        run_chat(config.agent_name)
+    except (KeyboardInterrupt, EOFError):
+        console.print()
+        panel(
+            f"[muted]See you later! {config.agent_name} will be here when you're back.[/muted]",
+            style="success",
+        )

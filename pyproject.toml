@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "repomind"
-version = "0.1.0"
+version = "0.1.4"
 description = "Ask your codebase anything — locally, privately, powerfully"
 readme = "README.md"
 license = { file = "LICENSE" }

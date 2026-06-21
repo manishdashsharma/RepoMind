@@ -11,6 +11,7 @@
 
 **Ask your codebase anything — locally, privately, powerfully.**
 
+[![Version](https://img.shields.io/badge/version-v0.1.4-orange.svg)](https://github.com/manishdashsharma/RepoMind)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![uv](https://img.shields.io/badge/managed%20by-uv-purple.svg)](https://github.com/astral-sh/uv)
@@ -74,32 +75,21 @@ $ repomind
 
 ## Quick Start
 
-### One-line install (macOS / Linux)
-
 ```bash
-curl -LsSf https://raw.githubusercontent.com/manishdashsharma/RepoMind/main/scripts/install.sh | bash
+git clone https://github.com/manishdashsharma/RepoMind.git
+cd RepoMind
+bash scripts/install.sh
 ```
 
-### Manual install
+That's it. The script installs RepoMind, detects your hardware, pulls the right model via Ollama, and starts Qdrant in Docker.
 
-```bash
-# 1. Install uv (if not already installed)
-curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# 2. Install RepoMind
-uv tool install repomind
-
-# 3. First-time setup (detects your hardware, pulls models, starts Qdrant)
-repomind install
-```
-
-### Start chatting
+After setup, just run:
 
 ```bash
 repomind
 ```
 
-That's it. Name your agent, point it at a project, and start asking questions.
+Name your agent, point it at a project, and start asking questions.
 
 ---
 

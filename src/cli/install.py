@@ -24,25 +24,24 @@ from repomind.utils.display import (
 )
 from repomind.utils.system import SystemSpec, detect_system, recommend_model
 
-_DOCKER_COMPOSE_CONTENT = """\
+_DOCKER_COMPOSE_TEMPLATE = """\
 services:
   qdrant:
-    image: qdrant/qdrant:v1.9.4
+    image: qdrant/qdrant:{qdrant_version}
     container_name: repomind-qdrant
     ports:
-      - "6333:6333"
-      - "6334:6334"
+      - "{port}:6333"
     volumes:
       - qdrant_data:/qdrant/storage
     environment:
       - QDRANT__LOG_LEVEL=WARN
     restart: unless-stopped
-    healthcheck:
-      test: ["CMD-SHELL", "curl -sf http://localhost:6333/collections || exit 1"]
-      interval: 10s
-      timeout: 5s
-      retries: 5
-      start_period: 15s
+    networks:
+      - repomind
+
+networks:
+  repomind:
+    name: repomind
 
 volumes:
   qdrant_data:
@@ -82,9 +81,8 @@ def run_install() -> None:
     console.print(model_table)
     console.print()
 
-    chosen_model = typer.prompt(
-        "Confirm model (or type another)", default=recommendation.model
-    ).strip()
+    raw = typer.prompt("Confirm model (or type another)", default=recommendation.model).strip()
+    chosen_model = recommendation.model if raw.lower() in ("y", "yes", "") else raw
 
     section("Permission & Consent")
 
@@ -119,16 +117,17 @@ def run_install() -> None:
 
     section("Starting Qdrant")
 
-    _start_qdrant()
+    qdrant_port = _start_qdrant()
 
     section("Health Checks")
 
-    _run_health_checks(ollama)
+    _run_health_checks(ollama, qdrant_port)
 
     new_config = RepoMindConfig(
         model=chosen_model,
         embed_model="nomic-embed-text",
         installed=True,
+        qdrant_port=qdrant_port,
     )
     save_config(new_config)
 
@@ -136,10 +135,17 @@ def run_install() -> None:
 
     panel(
         "[success]✓  RepoMind is ready![/success]\n\n"
-        "  Run [bold cyan]repomind[/bold cyan] to start chatting with your codebase.\n\n"
         f"  Model  :  [bold]{chosen_model}[/bold]\n"
         f"  Embed  :  [bold]nomic-embed-text[/bold]\n"
-        f"  Qdrant :  [bold]localhost:6333[/bold]",
+        f"  Qdrant :  [bold]localhost:{qdrant_port}[/bold]\n\n"
+        "  [bold]How to use:[/bold]\n\n"
+        "    [bold cyan]repomind[/bold cyan]                 — start chatting\n"
+        "    [bold cyan]repomind install[/bold cyan]         — reconfigure\n\n"
+        "  [bold]Inside chat:[/bold]\n\n"
+        "    [primary]1.[/primary] Index a project  →  give the full path to your repo\n"
+        "    [primary]2.[/primary] Ask anything     →  in English or Hindi\n"
+        "    [primary]3.[/primary] Switch projects  →  from the main menu\n\n"
+        "  [muted]Everything runs locally. No data leaves your machine.[/muted]",
         title="  Installation Complete  ",
         style="success",
     )
@@ -237,31 +243,52 @@ def _pull_model(ollama: OllamaClient, model: str) -> None:
     success(f"[bold]{model}[/bold] is ready")
 
 
-def _start_qdrant() -> None:
+def _start_qdrant() -> int:
     from repomind.config.settings import REPOMIND_DIR
+
+    for candidate in range(6333, 6343):
+        try:
+            resp = httpx.get(f"http://localhost:{candidate}/collections", timeout=1.0)
+            if resp.status_code == 200:
+                success(f"Qdrant already running on port {candidate}")
+                return candidate
+        except Exception:
+            pass
+
+    subprocess.run(
+        ["docker", "rm", "-f", "repomind-qdrant"],
+        capture_output=True,
+    )
+
+    port = _find_free_port(6333)
+    if port != 6333:
+        info(f"Port 6333 is in use — using port {port} instead")
 
     compose_dir = REPOMIND_DIR / "docker"
     compose_dir.mkdir(parents=True, exist_ok=True)
     compose_file = compose_dir / "docker-compose.yml"
-    compose_file.write_text(_DOCKER_COMPOSE_CONTENT, encoding="utf-8")
+    compose_file.write_text(
+        _DOCKER_COMPOSE_TEMPLATE.format(port=port, qdrant_version=_qdrant_server_version()),
+        encoding="utf-8",
+    )
 
     result = subprocess.run(
-        ["docker", "compose", "-f", str(compose_file), "up", "-d", "--remove-orphans"],
+        ["docker", "compose", "-f", str(compose_file), "up", "-d"],
         capture_output=True,
         text=True,
-        timeout=90,
+        timeout=120,
     )
     if result.returncode != 0:
         error(f"Failed to start Qdrant:\n{result.stderr.strip()}")
         raise typer.Exit(1)
 
     with spinner("Waiting for Qdrant to be ready..."):
-        for _ in range(30):
+        for _ in range(45):
             try:
-                resp = httpx.get("http://localhost:6333/collections", timeout=2.0)
+                resp = httpx.get(f"http://localhost:{port}/collections", timeout=2.0)
                 if resp.status_code == 200:
                     break
-            except (httpx.ConnectError, httpx.TimeoutException):
+            except Exception:
                 time.sleep(1)
         else:
             error(
@@ -270,13 +297,35 @@ def _start_qdrant() -> None:
             )
             raise typer.Exit(1)
 
-    success("Qdrant vector database is running")
+    success(f"Qdrant vector database is running on port {port}")
+    return port
 
 
-def _run_health_checks(ollama: OllamaClient) -> None:
+def _find_free_port(start: int) -> int:
+    import socket
+
+    for port in range(start, start + 10):
+        with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as s:
+            if s.connect_ex(("localhost", port)) != 0:
+                return port
+    return start + 10
+
+
+def _qdrant_server_version() -> str:
+    try:
+        import importlib.metadata
+
+        raw = importlib.metadata.version("qdrant-client")
+        parts = raw.split(".")
+        return f"v{parts[0]}.{parts[1]}.0"
+    except Exception:
+        return "v1.13.0"
+
+
+def _run_health_checks(ollama: OllamaClient, qdrant_port: int = 6333) -> None:
     checks: list[tuple[str, object]] = [
         ("Ollama API", ollama.is_running),
-        ("Qdrant API", _qdrant_healthy),
+        ("Qdrant API", lambda: _qdrant_healthy(qdrant_port)),
     ]
     all_ok = True
     for name, fn in checks:
@@ -299,8 +348,76 @@ def _run_health_checks(ollama: OllamaClient) -> None:
         raise typer.Exit(1)
 
 
-def _qdrant_healthy() -> bool:
+def _qdrant_healthy(port: int = 6333) -> bool:
     try:
-        return httpx.get("http://localhost:6333/collections", timeout=5.0).status_code == 200
+        return httpx.get(f"http://localhost:{port}/collections", timeout=5.0).status_code == 200
     except Exception:
         return False
+
+
+def run_uninstall() -> None:
+    from repomind.config.settings import REPOMIND_DIR
+
+    panel(
+        "This will remove:\n\n"
+        "  [primary]1.[/primary] Qdrant Docker container ([bold]repomind-qdrant[/bold])\n"
+        "  [primary]2.[/primary] Qdrant data volume ([bold]repomind_qdrant_data[/bold])\n"
+        "  [primary]3.[/primary] RepoMind config & sessions ([bold]~/.repomind/[/bold])\n\n"
+        "  [muted]The repomind command stays — run repomind install to start fresh.[/muted]\n"
+        "  [muted]Ollama models are NOT removed — they may be used by other apps.[/muted]",
+        title="  Uninstall RepoMind  ",
+        style="error",
+    )
+    console.print()
+
+    if not typer.confirm("  Are you sure? This cannot be undone.", default=False):
+        info("Uninstall cancelled.")
+        raise typer.Exit(0)
+
+    console.print()
+    section("Removing Qdrant")
+
+    result = subprocess.run(
+        ["docker", "rm", "-f", "repomind-qdrant"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode == 0:
+        success("Qdrant container removed")
+    else:
+        info("Qdrant container not found — skipping")
+
+    result = subprocess.run(
+        ["docker", "volume", "rm", "repomind_qdrant_data"],
+        capture_output=True,
+        text=True,
+    )
+    if result.returncode == 0:
+        success("Qdrant data volume removed")
+    else:
+        info("Qdrant volume not found — skipping")
+
+    result = subprocess.run(
+        ["docker", "network", "rm", "repomind"],
+        capture_output=True,
+        text=True,
+    )
+
+    section("Removing Config & Sessions")
+
+    import shutil
+
+    if REPOMIND_DIR.exists():
+        shutil.rmtree(REPOMIND_DIR)
+        success(f"Removed {REPOMIND_DIR}")
+    else:
+        info("Config directory not found — skipping")
+
+    console.print()
+    panel(
+        "[success]RepoMind data has been cleared.[/success]\n\n"
+        "  The [bold]repomind[/bold] command is still installed.\n"
+        "  Run [bold cyan]repomind install[/bold cyan] to start fresh anytime.",
+        title="  Done  ",
+        style="success",
+    )

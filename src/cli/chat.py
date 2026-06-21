@@ -4,6 +4,7 @@ import datetime
 from pathlib import Path
 
 import typer
+from rich.markdown import Markdown
 
 from repomind.config.settings import ProjectEntry, RepoMindConfig, load_config, save_config
 from repomind.embedder.embed import EmbedClient
@@ -51,7 +52,10 @@ def run_chat(agent_name: str) -> None:
 
     while True:
         _show_menu(agent_name)
-        choice = typer.prompt("Choice", default="1").strip()
+        try:
+            choice = typer.prompt("Choice", default="1").strip()
+        except (KeyboardInterrupt, EOFError):
+            raise KeyboardInterrupt from None
 
         if choice == "1":
             _ask_flow(config, rag, agent_name, session)
@@ -140,20 +144,19 @@ def _ask_flow(
             continue
 
         console.print()
-        console.print(f"  [agent]🤖 {agent_name}:[/agent]\n")
-
         collected: list[str] = []
         try:
-            for token in rag.ask(project_name, question):
-                console.print(token, end="", highlight=False)
-                collected.append(token)
+            with spinner(f"{agent_name} is thinking..."):
+                for token in rag.ask(project_name, question):
+                    collected.append(token)
         except Exception as exc:
-            console.print()
             error(f"Generation failed: {exc}")
             break
 
-        console.print()
-        session.log_question(project_name, question, "".join(collected))
+        full_answer = "".join(collected)
+        console.print(f"  [agent]🤖 {agent_name}:[/agent]\n")
+        console.print(Markdown(full_answer))
+        session.log_question(project_name, question, full_answer)
 
 
 def _index_flow(
@@ -173,12 +176,28 @@ def _index_flow(
         error(safety.block_reason)
         return
 
+    panel(
+        f"  [bold]RepoMind will:[/bold]\n\n"
+        f"  [primary]1.[/primary] Read source files from:\n"
+        f"      [bold]{repo_path}[/bold]\n\n"
+        f"  [primary]2.[/primary] Chunk and embed them locally via Ollama\n\n"
+        f"  [primary]3.[/primary] Store vectors in your local Qdrant instance\n\n"
+        f"  [muted]No files or code leave your machine. 100% local.[/muted]",
+        title="  Permission & Consent  ",
+        style="primary",
+    )
+    console.print()
+
+    if not typer.confirm("  Proceed with indexing?", default=True):
+        return
+
     if safety.warnings:
+        console.print()
         for w in safety.warnings:
             warning(w)
         if safety.sensitive_files:
             console.print(f"  [muted]Files: {', '.join(safety.sensitive_files[:5])}[/muted]")
-        if not typer.confirm("  Continue anyway?", default=False):
+        if not typer.confirm("  Index anyway?", default=False):
             return
 
     default_name = repo_path.name

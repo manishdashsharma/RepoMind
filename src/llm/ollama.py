@@ -38,8 +38,14 @@ class OllamaClient:
             available = self.list_models()
         except Exception:
             return False
-        model_base = model.split(":")[0]
-        return any(m == model or m.split(":")[0] == model_base for m in available)
+        name = model.split(":")[0]
+        tag = model.split(":")[1] if ":" in model else "latest"
+        for m in available:
+            m_name = m.split(":")[0]
+            m_tag = m.split(":")[1] if ":" in m else "latest"
+            if m_name == name and (tag == "latest" or m_tag.startswith(tag)):
+                return True
+        return False
 
     def pull_model(self, model: str) -> Generator[dict[str, Any], None, None]:
         with (
