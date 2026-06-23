@@ -82,7 +82,7 @@ class TestIndexRepository:
     def test_counts_indexable_files(self, tmp_path: Path) -> None:
         (tmp_path / "app.py").write_text("pass\n")
         (tmp_path / "style.css").write_text("body {}\n")
-        (tmp_path / "README.md").write_text("# Hi\n")
+        (tmp_path / "notes.md").write_text("# Hi\n")
         (tmp_path / "binary.bin").write_bytes(b"\x00\x01\x02")
         assert count_indexable_files(tmp_path) == 3
 

@@ -75,15 +75,27 @@ $ zeocloud
 
 ## Quick Start
 
-**Option 1 — PyPI (recommended):**
+**macOS / Linux:**
 
 ```bash
-pipx install zeocloud
+brew install pipx && pipx install zeocloud
 # or
+pip install zeocloud
+```
+
+**Windows:**
+
+```bash
+pip install zeocloud
+```
+
+**Via uv (any OS):**
+
+```bash
 uv tool install zeocloud
 ```
 
-**Option 2 — Clone:**
+**Clone karo (developers):**
 
 ```bash
 git clone https://github.com/manishdashsharma/Zeocloud.git
