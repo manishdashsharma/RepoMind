@@ -95,7 +95,7 @@ pip install zeocloud
 uv tool install zeocloud
 ```
 
-**Clone karo (developers):**
+**Clone (for developers):**
 
 ```bash
 git clone https://github.com/manishdashsharma/Zeocloud.git
