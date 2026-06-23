@@ -1,12 +1,12 @@
-# RepoMind — Troubleshooting
+# Zeocloud — Troubleshooting
 
 ---
 
 ## Installation Issues
 
-### `repomind install` fails: "Ollama is not installed"
+### `zeocloud install` fails: "Ollama is not installed"
 
-Ollama must be installed before running `repomind install`.
+Ollama must be installed before running `zeocloud install`.
 
 ```bash
 # macOS
@@ -20,16 +20,16 @@ After installing, start Ollama and retry:
 
 ```bash
 ollama serve
-repomind install
+zeocloud install
 ```
 
 ---
 
-### `repomind install` fails: "Docker is not installed" or "Docker is not running"
+### `zeocloud install` fails: "Docker is not installed" or "Docker is not running"
 
 Install Docker Desktop from https://www.docker.com/get-started
 
-On macOS, open Docker Desktop from Applications after installing. Wait for the whale icon to appear in the menu bar, then retry `repomind install`.
+On macOS, open Docker Desktop from Applications after installing. Wait for the whale icon to appear in the menu bar, then retry `zeocloud install`.
 
 On Linux:
 ```bash
@@ -44,7 +44,7 @@ Large models (llama3.1:8b = ~4.7 GB) take time on a slow connection. The progres
 
 1. Cancel with `Ctrl+C`
 2. Resume manually: `ollama pull llama3.1:8b`
-3. Re-run `repomind install`
+3. Re-run `zeocloud install`
 
 ---
 
@@ -53,7 +53,7 @@ Large models (llama3.1:8b = ~4.7 GB) take time on a slow connection. The progres
 Qdrant container didn't start within 30 seconds. Check what went wrong:
 
 ```bash
-docker logs repomind-qdrant
+docker logs zeocloud-qdrant
 ```
 
 Common causes:
@@ -67,7 +67,7 @@ Common causes:
 
 ### "Ollama is not running"
 
-Start Ollama before running `repomind`:
+Start Ollama before running `zeocloud`:
 
 ```bash
 ollama serve
@@ -82,15 +82,15 @@ Or on macOS, open the Ollama app from Applications.
 The Qdrant Docker container has stopped. Restart it:
 
 ```bash
-cd ~/.repomind/docker
+cd ~/.zeocloud/docker
 docker compose up -d
 ```
 
 Or check the container status:
 
 ```bash
-docker ps -a | grep repomind
-docker start repomind-qdrant
+docker ps -a | grep zeocloud
+docker start zeocloud-qdrant
 ```
 
 ---
@@ -106,7 +106,7 @@ docker start repomind-qdrant
 
 ### "No indexable source files found"
 
-RepoMind only indexes known source file types (Python, JS, Go, Rust, etc.). Check that:
+Zeocloud only indexes known source file types (Python, JS, Go, Rust, etc.). Check that:
 - The path points to a directory with source code, not just config files
 - The files aren't excluded by `.gitignore` in the project root
 - The directory isn't in the skip list (node_modules, dist, .venv, etc.)
@@ -126,7 +126,7 @@ RepoMind only indexes known source file types (Python, JS, Go, Rust, etc.). Chec
 Hindi requires at least `llama3.1:8b`. If you're on a lower model:
 
 1. `ollama pull llama3.1:8b`
-2. Edit `~/.repomind/config.json`: set `"model": "llama3.1:8b"`
+2. Edit `~/.zeocloud/config.json`: set `"model": "llama3.1:8b"`
 3. Continue chatting — no re-indexing needed
 
 ---
@@ -145,13 +145,13 @@ To speed it up:
 
 ### "Indexing … is not allowed"
 
-RepoMind blocks indexing of system directories (`/etc`, `/usr`, `~`, `~/.ssh`, etc.) to prevent accidental exposure of sensitive files. Index a specific project directory instead.
+Zeocloud blocks indexing of system directories (`/etc`, `/usr`, `~`, `~/.ssh`, etc.) to prevent accidental exposure of sensitive files. Index a specific project directory instead.
 
 ---
 
 ### Sensitive file warning appears
 
-RepoMind detected `.env`, private keys, or credentials files in your project. Options:
+Zeocloud detected `.env`, private keys, or credentials files in your project. Options:
 
 1. Add them to `.gitignore` (they'll be excluded automatically)
 2. Confirm to index anyway — the data stays local on your machine
@@ -162,13 +162,13 @@ RepoMind detected `.env`, private keys, or credentials files in your project. Op
 
 ### Collections disappear after restart
 
-This should not happen — Qdrant uses a named Docker volume (`repomind_qdrant_data`) that persists across restarts.
+This should not happen — Qdrant uses a named Docker volume (`zeocloud_qdrant_data`) that persists across restarts.
 
 If it happens, the volume was deleted. Re-index your projects.
 
 To verify the volume exists:
 ```bash
-docker volume ls | grep repomind
+docker volume ls | grep zeocloud
 ```
 
 ---
@@ -181,15 +181,15 @@ Another application is using port 6333.
 lsof -i :6333
 ```
 
-You can change Qdrant's port in `~/.repomind/docker/docker-compose.yml` (change `"6333:6333"` to `"6334:6333"`) and update `qdrant_port` in `~/.repomind/config.json`.
+You can change Qdrant's port in `~/.zeocloud/docker/docker-compose.yml` (change `"6333:6333"` to `"6334:6333"`) and update `qdrant_port` in `~/.zeocloud/config.json`.
 
 ---
 
 ## Still stuck?
 
-Open an issue on GitHub: https://github.com/manishdashsharma/RepoMind/issues
+Open an issue on GitHub: https://github.com/manishdashsharma/Zeocloud/issues
 
 Include:
-- Output of `repomind status`
+- Output of `zeocloud status`
 - Your OS and hardware (output of `uname -a` and `free -h` or `system_profiler SPHardwareDataType`)
 - The full error message

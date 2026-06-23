@@ -4,7 +4,7 @@ import datetime
 from dataclasses import dataclass, field
 from pathlib import Path
 
-from repomind.config.settings import SESSIONS_DIR
+from zeocloud.config.settings import SESSIONS_DIR
 
 
 @dataclass
@@ -52,7 +52,7 @@ def save_session(session: SessionData) -> Path | None:
     out: Path = SESSIONS_DIR / filename
 
     lines: list[str] = [
-        f"# RepoMind Session · {session.started_at.strftime('%Y-%m-%d %H:%M')}\n\n",
+        f"# Zeocloud Session · {session.started_at.strftime('%Y-%m-%d %H:%M')}\n\n",
         "## Summary\n\n",
         "| Field | Value |\n|---|---|\n",
         f"| Agent | {session.agent_name} |\n",

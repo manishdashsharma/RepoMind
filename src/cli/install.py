@@ -7,9 +7,9 @@ import time
 import httpx
 import typer
 
-from repomind.config.settings import RepoMindConfig, load_config, save_config
-from repomind.llm.ollama import LLMClient as OllamaClient
-from repomind.utils.display import (
+from zeocloud.config.settings import ZeocloudConfig, load_config, save_config
+from zeocloud.llm.ollama import LLMClient as OllamaClient
+from zeocloud.utils.display import (
     console,
     error,
     info,
@@ -22,13 +22,13 @@ from repomind.utils.display import (
     success,
     warning,
 )
-from repomind.utils.system import SystemSpec, detect_system, recommend_model
+from zeocloud.utils.system import SystemSpec, detect_system, recommend_model
 
 _DOCKER_COMPOSE_TEMPLATE = """\
 services:
   qdrant:
     image: qdrant/qdrant:{qdrant_version}
-    container_name: repomind-qdrant
+    container_name: zeocloud-qdrant
     ports:
       - "{port}:6333"
     volumes:
@@ -37,15 +37,15 @@ services:
       - QDRANT__LOG_LEVEL=WARN
     restart: unless-stopped
     networks:
-      - repomind
+      - zeocloud
 
 networks:
-  repomind:
-    name: repomind
+  zeocloud:
+    name: zeocloud
 
 volumes:
   qdrant_data:
-    name: repomind_qdrant_data
+    name: zeocloud_qdrant_data
 """
 
 
@@ -54,7 +54,7 @@ def run_install() -> None:
 
     config = load_config()
     if config.installed:
-        warning("RepoMind is already installed.")
+        warning("Zeocloud is already installed.")
         if not typer.confirm("Reinstall / reconfigure?", default=False):
             success("Nothing changed.")
             raise typer.Exit(0)
@@ -87,15 +87,15 @@ def run_install() -> None:
     section("Permission & Consent")
 
     panel(
-        f"RepoMind will:\n\n"
+        f"Zeocloud will:\n\n"
         f"  [primary]1.[/primary] Pull Ollama models:\n"
         f"      • [bold]{chosen_model}[/bold] (language model)\n"
         f"      • [bold]nomic-embed-text[/bold] (embedding model)\n\n"
         "  [primary]2.[/primary] Start Qdrant vector database"
         " via Docker [bold](port 6333)[/bold]\n\n"
-        f"  [primary]3.[/primary] Store config at [bold]~/.repomind/config.json[/bold]\n\n"
+        f"  [primary]3.[/primary] Store config at [bold]~/.zeocloud/config.json[/bold]\n\n"
         f"  [muted]No data leaves your machine. 100% local. Zero telemetry.[/muted]",
-        title="  RepoMind Setup  ",
+        title="  Zeocloud Setup  ",
         style="primary",
     )
     console.print()
@@ -123,7 +123,7 @@ def run_install() -> None:
 
     _run_health_checks(ollama, qdrant_port)
 
-    new_config = RepoMindConfig(
+    new_config = ZeocloudConfig(
         model=chosen_model,
         embed_model="nomic-embed-text",
         installed=True,
@@ -134,13 +134,13 @@ def run_install() -> None:
     section("Done")
 
     panel(
-        "[success]✓  RepoMind is ready![/success]\n\n"
+        "[success]✓  Zeocloud is ready![/success]\n\n"
         f"  Model  :  [bold]{chosen_model}[/bold]\n"
         f"  Embed  :  [bold]nomic-embed-text[/bold]\n"
         f"  Qdrant :  [bold]localhost:{qdrant_port}[/bold]\n\n"
         "  [bold]How to use:[/bold]\n\n"
-        "    [bold cyan]repomind[/bold cyan]                 — start chatting\n"
-        "    [bold cyan]repomind install[/bold cyan]         — reconfigure\n\n"
+        "    [bold cyan]zeocloud[/bold cyan]                 — start chatting\n"
+        "    [bold cyan]zeocloud install[/bold cyan]         — reconfigure\n\n"
         "  [bold]Inside chat:[/bold]\n\n"
         "    [primary]1.[/primary] Index a project  →  give the full path to your repo\n"
         "    [primary]2.[/primary] Ask anything     →  in English or Hindi\n"
@@ -173,7 +173,7 @@ def _check_ollama() -> None:
         error("Ollama is not installed.")
         console.print()
         console.print("  Install it from: [bold cyan]https://ollama.com/download[/bold cyan]")
-        console.print("  Then run:        [bold]repomind install[/bold]")
+        console.print("  Then run:        [bold]zeocloud install[/bold]")
         raise typer.Exit(1)
 
     ollama = OllamaClient()
@@ -244,7 +244,7 @@ def _pull_model(ollama: OllamaClient, model: str) -> None:
 
 
 def _start_qdrant() -> int:
-    from repomind.config.settings import REPOMIND_DIR
+    from zeocloud.config.settings import ZEOCLOUD_DIR
 
     for candidate in range(6333, 6343):
         try:
@@ -256,7 +256,7 @@ def _start_qdrant() -> int:
             pass
 
     subprocess.run(
-        ["docker", "rm", "-f", "repomind-qdrant"],
+        ["docker", "rm", "-f", "zeocloud-qdrant"],
         capture_output=True,
     )
 
@@ -264,7 +264,7 @@ def _start_qdrant() -> int:
     if port != 6333:
         info(f"Port 6333 is in use — using port {port} instead")
 
-    compose_dir = REPOMIND_DIR / "docker"
+    compose_dir = ZEOCLOUD_DIR / "docker"
     compose_dir.mkdir(parents=True, exist_ok=True)
     compose_file = compose_dir / "docker-compose.yml"
     compose_file.write_text(
@@ -293,7 +293,7 @@ def _start_qdrant() -> int:
         else:
             error(
                 "Qdrant did not become healthy in time."
-                " Run: [bold]docker logs repomind-qdrant[/bold]"
+                " Run: [bold]docker logs zeocloud-qdrant[/bold]"
             )
             raise typer.Exit(1)
 
@@ -343,7 +343,7 @@ def _run_health_checks(ollama: OllamaClient, qdrant_port: int = 6333) -> None:
         console.print()
         error(
             "One or more services failed health checks."
-            " Fix the issue and run [bold]repomind install[/bold] again."
+            " Fix the issue and run [bold]zeocloud install[/bold] again."
         )
         raise typer.Exit(1)
 
@@ -356,16 +356,16 @@ def _qdrant_healthy(port: int = 6333) -> bool:
 
 
 def run_uninstall() -> None:
-    from repomind.config.settings import REPOMIND_DIR
+    from zeocloud.config.settings import ZEOCLOUD_DIR
 
     panel(
         "This will remove:\n\n"
-        "  [primary]1.[/primary] Qdrant Docker container ([bold]repomind-qdrant[/bold])\n"
-        "  [primary]2.[/primary] Qdrant data volume ([bold]repomind_qdrant_data[/bold])\n"
-        "  [primary]3.[/primary] RepoMind config & sessions ([bold]~/.repomind/[/bold])\n\n"
-        "  [muted]The repomind command stays — run repomind install to start fresh.[/muted]\n"
+        "  [primary]1.[/primary] Qdrant Docker container ([bold]zeocloud-qdrant[/bold])\n"
+        "  [primary]2.[/primary] Qdrant data volume ([bold]zeocloud_qdrant_data[/bold])\n"
+        "  [primary]3.[/primary] Zeocloud config & sessions ([bold]~/.zeocloud/[/bold])\n\n"
+        "  [muted]The zeocloud command stays — run zeocloud install to start fresh.[/muted]\n"
         "  [muted]Ollama models are NOT removed — they may be used by other apps.[/muted]",
-        title="  Uninstall RepoMind  ",
+        title="  Uninstall Zeocloud  ",
         style="error",
     )
     console.print()
@@ -378,7 +378,7 @@ def run_uninstall() -> None:
     section("Removing Qdrant")
 
     result = subprocess.run(
-        ["docker", "rm", "-f", "repomind-qdrant"],
+        ["docker", "rm", "-f", "zeocloud-qdrant"],
         capture_output=True,
         text=True,
     )
@@ -388,7 +388,7 @@ def run_uninstall() -> None:
         info("Qdrant container not found — skipping")
 
     result = subprocess.run(
-        ["docker", "volume", "rm", "repomind_qdrant_data"],
+        ["docker", "volume", "rm", "zeocloud_qdrant_data"],
         capture_output=True,
         text=True,
     )
@@ -398,7 +398,7 @@ def run_uninstall() -> None:
         info("Qdrant volume not found — skipping")
 
     result = subprocess.run(
-        ["docker", "network", "rm", "repomind"],
+        ["docker", "network", "rm", "zeocloud"],
         capture_output=True,
         text=True,
     )
@@ -407,17 +407,17 @@ def run_uninstall() -> None:
 
     import shutil
 
-    if REPOMIND_DIR.exists():
-        shutil.rmtree(REPOMIND_DIR)
-        success(f"Removed {REPOMIND_DIR}")
+    if ZEOCLOUD_DIR.exists():
+        shutil.rmtree(ZEOCLOUD_DIR)
+        success(f"Removed {ZEOCLOUD_DIR}")
     else:
         info("Config directory not found — skipping")
 
     console.print()
     panel(
-        "[success]RepoMind data has been cleared.[/success]\n\n"
-        "  The [bold]repomind[/bold] command is still installed.\n"
-        "  Run [bold cyan]repomind install[/bold cyan] to start fresh anytime.",
+        "[success]Zeocloud data has been cleared.[/success]\n\n"
+        "  The [bold]zeocloud[/bold] command is still installed.\n"
+        "  Run [bold cyan]zeocloud install[/bold cyan] to start fresh anytime.",
         title="  Done  ",
         style="success",
     )

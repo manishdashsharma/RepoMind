@@ -3,7 +3,7 @@ requires = ["setuptools>=68", "wheel"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "repomind"
+name = "zeocloud"
 version = "0.1.4"
 description = "Ask your codebase anything — locally, privately, powerfully"
 readme = "README.md"
@@ -33,24 +33,24 @@ dependencies = [
 ]
 
 [project.urls]
-Homepage  = "https://github.com/manishdashsharma/RepoMind"
-Repository = "https://github.com/manishdashsharma/RepoMind"
-Issues    = "https://github.com/manishdashsharma/RepoMind/issues"
+Homepage  = "https://github.com/manishdashsharma/Zeocloud"
+Repository = "https://github.com/manishdashsharma/Zeocloud"
+Issues    = "https://github.com/manishdashsharma/Zeocloud/issues"
 
 [project.scripts]
-repomind = "repomind.cli.main:app"
+zeocloud = "zeocloud.cli.main:app"
 
 [tool.setuptools]
-package-dir = { "repomind" = "src" }
+package-dir = { "zeocloud" = "src" }
 packages    = [
-    "repomind",
-    "repomind.cli",
-    "repomind.config",
-    "repomind.llm",
-    "repomind.embedder",
-    "repomind.indexer",
-    "repomind.retriever",
-    "repomind.utils",
+    "zeocloud",
+    "zeocloud.cli",
+    "zeocloud.config",
+    "zeocloud.llm",
+    "zeocloud.embedder",
+    "zeocloud.indexer",
+    "zeocloud.retriever",
+    "zeocloud.utils",
 ]
 
 [dependency-groups]
@@ -72,7 +72,7 @@ select = ["E", "W", "F", "I", "UP", "B", "SIM", "C4"]
 ignore = ["B008", "UP007"]
 
 [tool.ruff.lint.isort]
-known-first-party = ["repomind"]
+known-first-party = ["zeocloud"]
 
 [tool.mypy]
 python_version     = "3.11"

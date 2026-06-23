@@ -3,9 +3,9 @@ from __future__ import annotations
 from collections.abc import Generator
 from dataclasses import dataclass
 
-from repomind.embedder.embed import EmbedClient
-from repomind.llm.ollama import LLMClient
-from repomind.retriever.qdrant import SearchResult, VectorStore
+from zeocloud.embedder.embed import EmbedClient
+from zeocloud.llm.ollama import LLMClient
+from zeocloud.retriever.qdrant import SearchResult, VectorStore
 
 
 @dataclass
@@ -18,7 +18,7 @@ class ConversationTurn:
 
 def _system_prompt(agent_name: str, project: str) -> str:
     return (
-        f"You are {agent_name}, the AI assistant built into RepoMind"
+        f"You are {agent_name}, the AI assistant built into Zeocloud"
         " — a developer tool that helps engineers understand codebases"
         " without sending a single byte to the cloud.\n\n"
         f'You are currently helping with the project: "{project}"\n\n'
@@ -39,7 +39,7 @@ def _system_prompt(agent_name: str, project: str) -> str:
         "- Cite file paths and line numbers when referencing code\n"
         "- For longer answers, use bullet points or numbered steps\n\n"
         "You run locally on the developer's machine."
-        " No data leaves their computer. This is the RepoMind promise."
+        " No data leaves their computer. This is the Zeocloud promise."
     )
 
 
@@ -50,7 +50,7 @@ class RAGPipeline:
         embedder: EmbedClient,
         store: VectorStore,
         model: str,
-        agent_name: str = "RepoMind",
+        agent_name: str = "Zeocloud",
     ) -> None:
         self._llm = llm
         self._embedder = embedder
@@ -74,7 +74,7 @@ class RAGPipeline:
                 "Suggestions:\n"
                 "- Try different keywords or a more specific question\n"
                 "- Make sure the project was indexed recently\n"
-                "- Use `repomind reindex <project>` if you've added new files"
+                "- Use `zeocloud reindex <project>` if you've added new files"
             )
             yield answer
             self._history.append(ConversationTurn(question, answer, project, []))

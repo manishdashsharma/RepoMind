@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import httpx
 
-from repomind.llm.ollama import OllamaError
+from zeocloud.llm.ollama import OllamaError
 
 
 class EmbedClient:

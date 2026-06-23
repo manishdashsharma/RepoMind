@@ -71,8 +71,8 @@ ensure_docker() {
     success "Docker is running"
 }
 
-install_repomind() {
-    info "Installing RepoMind..."
+install_zeocloud() {
+    info "Installing Zeocloud..."
     if command -v uv &>/dev/null; then
         uv tool install "$REPO_DIR" --reinstall --quiet
         export PATH="$HOME/.local/bin:$PATH"
@@ -83,13 +83,13 @@ install_repomind() {
         /usr/bin/python3 -m pip install --user "$REPO_DIR" --quiet
         export PATH="$HOME/.local/bin:$PATH"
     fi
-    success "RepoMind installed"
+    success "Zeocloud installed"
 }
 
 run_setup() {
-    info "Starting RepoMind setup wizard..."
+    info "Starting Zeocloud setup wizard..."
     echo ""
-    repomind install
+    zeocloud install
 }
 
 main() {
@@ -97,7 +97,7 @@ main() {
     echo ""
     check_python
     ensure_docker
-    install_repomind
+    install_zeocloud
     echo ""
     run_setup
 }

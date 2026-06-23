@@ -2,15 +2,15 @@ from __future__ import annotations
 
 import typer
 
-from repomind.cli.chat import run_chat
-from repomind.cli.install import run_install, run_uninstall
-from repomind.config.settings import load_config, save_config
-from repomind.llm.ollama import LLMClient
-from repomind.retriever.qdrant import VectorStore
-from repomind.utils.display import console, make_table, panel, print_banner, section, success
+from zeocloud.cli.chat import run_chat
+from zeocloud.cli.install import run_install, run_uninstall
+from zeocloud.config.settings import load_config, save_config
+from zeocloud.llm.ollama import LLMClient
+from zeocloud.retriever.qdrant import VectorStore
+from zeocloud.utils.display import console, make_table, panel, print_banner, section, success
 
 app = typer.Typer(
-    name="repomind",
+    name="zeocloud",
     help="Ask your codebase anything — locally, privately, powerfully.",
     add_completion=True,
     rich_markup_mode="rich",
@@ -24,12 +24,12 @@ def install_command() -> None:
     run_install()
 
 
-@app.command("uninstall", help="Remove RepoMind container, data volume, and config.")
+@app.command("uninstall", help="Remove Zeocloud container, data volume, and config.")
 def uninstall_command() -> None:
     run_uninstall()
 
 
-@app.command("status", help="Check health of all RepoMind services.")
+@app.command("status", help="Check health of all Zeocloud services.")
 def status_command() -> None:
     print_banner()
     config = load_config()
@@ -57,7 +57,7 @@ def status_command() -> None:
     cfg_table.add_row("Model", config.model)
     cfg_table.add_row("Embed model", config.embed_model)
     cfg_table.add_row("Projects", str(len(config.projects)))
-    cfg_table.add_row("Config file", "~/.repomind/config.json")
+    cfg_table.add_row("Config file", "~/.zeocloud/config.json")
     console.print(cfg_table)
 
     if config.projects:
@@ -84,9 +84,9 @@ def main(ctx: typer.Context) -> None:
     if not config.installed:
         panel(
             "Looks like this is your first time here. Welcome! 👋\n\n"
-            "Run [bold cyan]repomind install[/bold cyan] to set up models and start Qdrant.\n"
+            "Run [bold cyan]zeocloud install[/bold cyan] to set up models and start Qdrant.\n"
             "[muted]Takes 5–10 minutes depending on your internet speed.[/muted]",
-            title="  Welcome to RepoMind  ",
+            title="  Welcome to Zeocloud  ",
             style="primary",
         )
         raise typer.Exit(0)
@@ -101,7 +101,7 @@ def main(ctx: typer.Context) -> None:
         config.agent_name = name
         save_config(config)
         console.print()
-        success(f"[bold]{name}[/bold] is your RepoMind agent. Let's go!")
+        success(f"[bold]{name}[/bold] is your Zeocloud agent. Let's go!")
         console.print()
 
     try:

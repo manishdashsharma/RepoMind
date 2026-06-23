@@ -5,9 +5,9 @@ from pathlib import Path
 
 from pydantic import BaseModel, Field, field_validator
 
-REPOMIND_DIR = Path.home() / ".repomind"
-CONFIG_FILE = REPOMIND_DIR / "config.json"
-SESSIONS_DIR = REPOMIND_DIR / "sessions"
+ZEOCLOUD_DIR = Path.home() / ".zeocloud"
+CONFIG_FILE = ZEOCLOUD_DIR / "config.json"
+SESSIONS_DIR = ZEOCLOUD_DIR / "sessions"
 
 
 class ProjectEntry(BaseModel):
@@ -18,7 +18,7 @@ class ProjectEntry(BaseModel):
     chunk_count: int = 0
 
 
-class RepoMindConfig(BaseModel):
+class ZeocloudConfig(BaseModel):
     agent_name: str | None = None
     model: str = "llama3.2:3b"
     embed_model: str = "nomic-embed-text"
@@ -34,25 +34,25 @@ class RepoMindConfig(BaseModel):
         return v.rstrip("/")
 
 
-def load_config() -> RepoMindConfig:
-    REPOMIND_DIR.mkdir(parents=True, exist_ok=True)
+def load_config() -> ZeocloudConfig:
+    ZEOCLOUD_DIR.mkdir(parents=True, exist_ok=True)
     if not CONFIG_FILE.exists():
-        config = RepoMindConfig()
+        config = ZeocloudConfig()
         _write(config)
         return config
     try:
         data = json.loads(CONFIG_FILE.read_text(encoding="utf-8"))
-        return RepoMindConfig.model_validate(data)
+        return ZeocloudConfig.model_validate(data)
     except (json.JSONDecodeError, ValueError):
-        config = RepoMindConfig()
+        config = ZeocloudConfig()
         _write(config)
         return config
 
 
-def save_config(config: RepoMindConfig) -> None:
-    REPOMIND_DIR.mkdir(parents=True, exist_ok=True)
+def save_config(config: ZeocloudConfig) -> None:
+    ZEOCLOUD_DIR.mkdir(parents=True, exist_ok=True)
     _write(config)
 
 
-def _write(config: RepoMindConfig) -> None:
+def _write(config: ZeocloudConfig) -> None:
     CONFIG_FILE.write_text(config.model_dump_json(indent=2), encoding="utf-8")

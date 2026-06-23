@@ -1,22 +1,22 @@
-# RepoMind — Architecture
+# Zeocloud — Architecture
 
 ## Overview
 
-RepoMind is a local-first RAG (Retrieval Augmented Generation) system for codebases. Every component runs on the developer's machine — no cloud, no telemetry.
+Zeocloud is a local-first RAG (Retrieval Augmented Generation) system for codebases. Every component runs on the developer's machine — no cloud, no telemetry.
 
 ```
 Developer
    │
    ▼
-repomind (CLI)
+zeocloud (CLI)
    │
-   ├── repomind install       ← One-time setup wizard
+   ├── zeocloud install       ← One-time setup wizard
    │     ├── Detect hardware (CPU/RAM/GPU)
    │     ├── Suggest Ollama model
    │     ├── Pull models via Ollama
    │     └── Start Qdrant in Docker
    │
-   └── repomind               ← Main interactive loop
+   └── zeocloud               ← Main interactive loop
          ├── Name your agent
          ├── Index a project  ─────────────────────────────┐
          │     ├── Walk repo (respects .gitignore)          │
@@ -61,7 +61,7 @@ repomind (CLI)
 
 | File | Responsibility |
 |------|---------------|
-| `settings.py` | Pydantic config model, read/write `~/.repomind/config.json` |
+| `settings.py` | Pydantic config model, read/write `~/.zeocloud/config.json` |
 
 ## Data Flow — Indexing
 
@@ -78,7 +78,7 @@ indexer._chunk()        # 400 token chunks, 80 token overlap, line numbers track
 ollama.embed()          # nomic-embed-text → 768-dim float vector per chunk
    │
    ▼
-vector_store.upsert()   # stored in Qdrant collection "repomind_{project_name}"
+vector_store.upsert()   # stored in Qdrant collection "zeocloud_{project_name}"
 ```
 
 ## Data Flow — Q&A
@@ -109,10 +109,10 @@ Sources listed              # file paths + line numbers
 
 | What | Where |
 |------|-------|
-| Config | `~/.repomind/config.json` |
-| Session logs | `~/.repomind/sessions/{date}.md` |
-| Qdrant data | Docker volume `repomind_qdrant_data` |
-| Qdrant compose | `~/.repomind/docker/docker-compose.yml` |
+| Config | `~/.zeocloud/config.json` |
+| Session logs | `~/.zeocloud/sessions/{date}.md` |
+| Qdrant data | Docker volume `zeocloud_qdrant_data` |
+| Qdrant compose | `~/.zeocloud/docker/docker-compose.yml` |
 
 ## Model Selection Matrix
 
@@ -142,5 +142,5 @@ Embedding model is always `nomic-embed-text` (dim=768) regardless of LLM choice.
 - Zero network calls to any external service
 - Ollama serves on `localhost:11434`
 - Qdrant serves on `localhost:6333` (Docker, not exposed externally)
-- Config stored in `~/.repomind/` with default OS permissions
+- Config stored in `~/.zeocloud/` with default OS permissions
 - No credentials, no API keys, no accounts required

@@ -19,7 +19,7 @@ _BLOCKED_TREES: frozenset[Path] = frozenset(
         Path.home() / ".ssh",
         Path.home() / ".aws",
         Path.home() / ".gnupg",
-        Path.home() / ".repomind",
+        Path.home() / ".zeocloud",
     }
 )
 

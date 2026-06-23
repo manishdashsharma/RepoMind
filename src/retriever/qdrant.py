@@ -12,7 +12,7 @@ from qdrant_client.http.models import (
     VectorParams,
 )
 
-_PREFIX = "repomind_"
+_PREFIX = "zeocloud_"
 _DEFAULT_DIM = 768
 
 

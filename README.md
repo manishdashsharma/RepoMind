@@ -1,17 +1,18 @@
 <div align="center">
 
 <pre>
- ██████╗ ███████╗██████╗  ██████╗ ███╗   ███╗██╗███╗   ██╗██████╗
- ██╔══██╗██╔════╝██╔══██╗██╔═══██╗████╗ ████║██║████╗  ██║██╔══██╗
- ██████╔╝█████╗  ██████╔╝██║   ██║██╔████╔██║██║██╔██╗ ██║██║  ██║
- ██╔══██╗██╔══╝  ██╔═══╝ ██║   ██║██║╚██╔╝██║██║██║╚██╗██║██║  ██║
- ██║  ██║███████╗██║     ╚██████╔╝██║ ╚═╝ ██║██║██║ ╚████║██████╔╝
- ╚═╝  ╚═╝╚══════╝╚═╝      ╚═════╝ ╚═╝     ╚═╝╚═╝╚═╝  ╚═══╝╚═════╝
+███████╗███████╗ ██████╗  ██████╗██╗      ██████╗ ██╗   ██╗██████╗
+╚══███╔╝██╔════╝██╔═══██╗██╔════╝██║     ██╔═══██╗██║   ██║██╔══██╗
+  ███╔╝ █████╗  ██║   ██║██║     ██║     ██║   ██║██║   ██║██║  ██║
+ ███╔╝  ██╔══╝  ██║   ██║██║     ██║     ██║   ██║██║   ██║██║  ██║
+███████╗███████╗╚██████╔╝╚██████╗███████╗╚██████╔╝╚██████╔╝██████╔╝
+╚══════╝╚══════╝ ╚═════╝  ╚═════╝╚══════╝ ╚═════╝  ╚═════╝ ╚═════╝
 </pre>
 
 **Ask your codebase anything — locally, privately, powerfully.**
 
-[![Version](https://img.shields.io/badge/version-v0.1.4-orange.svg)](https://github.com/manishdashsharma/RepoMind)
+[![Version](https://img.shields.io/badge/version-v0.1.4-orange.svg)](https://github.com/manishdashsharma/Zeocloud)
+[![PyPI](https://img.shields.io/pypi/v/zeocloud.svg)](https://pypi.org/project/zeocloud/)
 [![License: MIT](https://img.shields.io/badge/License-MIT-blue.svg)](LICENSE)
 [![Python 3.11+](https://img.shields.io/badge/Python-3.11+-blue.svg)](https://python.org)
 [![uv](https://img.shields.io/badge/managed%20by-uv-purple.svg)](https://github.com/astral-sh/uv)
@@ -23,14 +24,14 @@
 
 ---
 
-## What is RepoMind?
+## What is Zeocloud?
 
-RepoMind is an open-source CLI tool that lets you have natural conversations with any codebase — in **English or Hindi** — without sending a single byte to the cloud.
+Zeocloud is an open-source CLI tool that lets you have natural conversations with any codebase — in **English or Hindi** — without sending a single byte to the cloud.
 
 It indexes your code locally, stores vectors in a local Qdrant database, and uses Ollama to run language models on your own hardware. No API keys. No subscriptions. No privacy concerns.
 
 ```bash
-$ repomind
+$ zeocloud
 
  ⚡ buddy is listening
 
@@ -56,9 +57,9 @@ $ repomind
 - **Any language** — Python, JS, TS, Go, Rust, Java, C++, and 40+ more
 - **Gitignore-aware** — skips `node_modules`, build artifacts, binary files
 - **Safety guardrails** — blocks indexing of system directories, warns about `.env` files
-- **Session logs** — every conversation is saved to `~/.repomind/sessions/`
+- **Session logs** — every conversation is saved to `~/.zeocloud/sessions/`
 - **Beautiful CLI** — Rich-powered colorful terminal with progress bars, spinners, tables
-- **`repomind status`** — health check for all services at a glance
+- **`zeocloud status`** — health check for all services at a glance
 
 ---
 
@@ -67,7 +68,6 @@ $ repomind
 | Tool | Version | Purpose |
 |------|---------|---------|
 | [Python](https://python.org) | 3.11+ | Runtime |
-| [uv](https://github.com/astral-sh/uv) | latest | Package manager |
 | [Ollama](https://ollama.com/download) | latest | Local LLM |
 | [Docker](https://www.docker.com/get-started) | latest | Vector database |
 
@@ -75,18 +75,32 @@ $ repomind
 
 ## Quick Start
 
+**Option 1 — PyPI (recommended):**
+
 ```bash
-git clone https://github.com/manishdashsharma/RepoMind.git
-cd RepoMind
+pipx install zeocloud
+# or
+uv tool install zeocloud
+```
+
+**Option 2 — Clone:**
+
+```bash
+git clone https://github.com/manishdashsharma/Zeocloud.git
+cd Zeocloud
 bash scripts/install.sh
 ```
 
-That's it. The script installs RepoMind, detects your hardware, pulls the right model via Ollama, and starts Qdrant in Docker.
+Then run setup:
+
+```bash
+zeocloud install
+```
 
 After setup, just run:
 
 ```bash
-repomind
+zeocloud
 ```
 
 Name your agent, point it at a project, and start asking questions.
@@ -95,7 +109,7 @@ Name your agent, point it at a project, and start asking questions.
 
 ## Usage
 
-### `repomind install`
+### `zeocloud install`
 
 Interactive setup wizard that:
 1. Detects your CPU, RAM, and GPU
@@ -105,7 +119,7 @@ Interactive setup wizard that:
 5. Runs health checks on all services
 
 ```
-$ repomind install
+$ zeocloud install
 
   System Detection
   ┌──────────────┬──────────────────────────────────┐
@@ -121,13 +135,13 @@ $ repomind install
   Recommended: llama3.1:8b  ★★★★☆ Great
 ```
 
-### `repomind`
+### `zeocloud`
 
 ```
-$ repomind
+$ zeocloud
 
   ╔═══════════════════════════════════════╗
-  ║           R E P O M I N D            ║
+  ║           Z E O C L O U D            ║
   ║    Ask your codebase anything         ║
   ╚═══════════════════════════════════════╝
 
@@ -138,7 +152,7 @@ $ repomind
 
   Agent name [buddy]: aria
 
-  ✓  aria is your RepoMind agent. Let's go!
+  ✓  aria is your Zeocloud agent. Let's go!
 
   ⚡  aria is listening
 
@@ -154,11 +168,11 @@ $ repomind
 On **first run**, you name your AI agent — call it anything you like. That name is saved and used in every session going forward. Then the interactive menu appears:
 
 - **Ask a question** — select a project and ask anything in English or Hindi
-- **Index a new project** — provide a path, RepoMind indexes all source files
+- **Index a new project** — provide a path, Zeocloud indexes all source files
 - **View projects** — table of all indexed projects with stats
 - **Remove a project** — deletes vectors from Qdrant and config entry
 
-### `repomind status`
+### `zeocloud status`
 
 Check health of all services at a glance:
 
@@ -186,7 +200,7 @@ Your Code
   Embedder         nomic-embed-text via Ollama → 768-dim vectors
     │
     ▼
-  Qdrant           Store in collection repomind_{project} (cosine similarity)
+  Qdrant           Store in collection zeocloud_{project} (cosine similarity)
     │
     ▼  ──── at query time ────
     │
@@ -206,7 +220,7 @@ Your Code
 
 ## Model Selection Guide
 
-RepoMind auto-detects your hardware and picks the best model:
+Zeocloud auto-detects your hardware and picks the best model:
 
 | Your Machine | Suggested Model | Quality |
 |-------------|----------------|---------|
@@ -225,8 +239,8 @@ RepoMind auto-detects your hardware and picks the best model:
 ## Project Layout
 
 ```
-repomind/
-├── src/                     ← Package root (maps to repomind.*)
+zeocloud/
+├── src/                     ← Package root (maps to zeocloud.*)
 │   ├── cli/                 ← Commands: main, install, chat
 │   ├── config/              ← Settings model + persistence
 │   ├── llm/                 ← Ollama LLM client (generate, pull, status)
@@ -238,17 +252,17 @@ repomind/
 ├── docs/                    ← Architecture docs
 ├── sessions/                ← (gitignored) session log output during dev
 ├── tests/                   ← pytest unit tests
-└── scripts/install.sh       ← curl-pipe bootstrap script
+└── scripts/install.sh       ← bootstrap script
 ```
 
 ---
 
 ## Session Logs
 
-After every chat session, RepoMind writes a structured markdown log to `~/.repomind/sessions/`:
+After every chat session, Zeocloud writes a structured markdown log to `~/.zeocloud/sessions/`:
 
 ```
-~/.repomind/sessions/
+~/.zeocloud/sessions/
   2024-01-15_14-32-07.md
   2024-01-16_09-45-22.md
 ```
@@ -262,24 +276,24 @@ Each log contains:
 
 ## Privacy
 
-RepoMind is designed from the ground up to keep your code private:
+Zeocloud is designed from the ground up to keep your code private:
 
 - **No cloud calls** — Ollama and Qdrant both run on `localhost`
 - **No telemetry** — zero analytics, no crash reporting, nothing leaves your machine
 - **No accounts** — no sign-up, no API keys
 - **Vectors are local** — stored in a Docker volume on your machine
-- **Config is local** — `~/.repomind/config.json`, readable only by you
+- **Config is local** — `~/.zeocloud/config.json`, readable only by you
 
 ---
 
 ## Development
 
 ```bash
-git clone https://github.com/manishdashsharma/RepoMind
-cd repomind
+git clone https://github.com/manishdashsharma/Zeocloud.git
+cd Zeocloud
 uv sync              # install deps + package in editable mode
-uv run repomind install
-uv run repomind
+uv run zeocloud install
+uv run zeocloud
 ```
 
 ### Running tests
@@ -313,7 +327,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting your first PR.
 ### Ideas for contributions
 
 - [ ] Incremental reindexing (only re-embed changed files)
-- [ ] `repomind config` command to update settings from CLI
+- [ ] `zeocloud config` command to update settings from CLI
 - [ ] Support for remote Ollama / Qdrant instances
 - [ ] Export session logs to different formats
 - [ ] File-level filtering when asking questions
@@ -324,7 +338,7 @@ Please read [CONTRIBUTING.md](CONTRIBUTING.md) before submitting your first PR.
 ## FAQ
 
 **Q: How is this different from GitHub Copilot or Cursor?**  
-A: Those send your code to external servers. RepoMind runs entirely on your machine — your code never leaves.
+A: Those send your code to external servers. Zeocloud runs entirely on your machine — your code never leaves.
 
 **Q: Does it work on Windows?**  
 A: Not officially tested yet. Docker and Ollama support Windows, so it should work. PRs welcome!
@@ -333,7 +347,7 @@ A: Not officially tested yet. Docker and Ollama support Windows, so it should wo
 A: Currently Ollama-only. Support for other local providers is on the roadmap.
 
 **Q: How do I update the model after install?**  
-A: Run `repomind install` again and choose a different model when prompted.
+A: Run `zeocloud install` again and choose a different model when prompted.
 
 **Q: My Hindi answers aren't great. What model should I use?**  
 A: Use `llama3.1:8b` or larger. Smaller models have limited multilingual support.
@@ -367,6 +381,6 @@ MIT © [Manish Dash Sharma](https://www.manishdashsharma.com/)
 
 Built with ❤️ for the developer community · 100% local · 100% yours
 
-**[⭐ Star this repo](https://github.com/manishdashsharma/RepoMind)** if RepoMind helps you understand code faster!
+**[⭐ Star this repo](https://github.com/manishdashsharma/Zeocloud)** if Zeocloud helps you understand code faster!
 
 </div>

@@ -4,7 +4,7 @@ from pathlib import Path
 
 import tiktoken
 
-from repomind.indexer.indexer import (
+from zeocloud.indexer.indexer import (
     _chunk_file,
     _detect_language,
     _read_safe,

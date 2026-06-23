@@ -1,14 +1,14 @@
-# Contributing to RepoMind
+# Contributing to Zeocloud
 
-RepoMind is open source and contributions are welcome. This document explains how to set up a dev environment, the module structure, and what good contributions look like.
+Zeocloud is open source and contributions are welcome. This document explains how to set up a dev environment, the module structure, and what good contributions look like.
 
 ---
 
 ## Development Setup
 
 ```bash
-git clone https://github.com/manishdashsharma/RepoMind
-cd repomind
+git clone https://github.com/manishdashsharma/Zeocloud
+cd Zeocloud
 
 # Install uv (if you don't have it)
 curl -LsSf https://astral.sh/uv/install.sh | sh
@@ -17,8 +17,8 @@ curl -LsSf https://astral.sh/uv/install.sh | sh
 uv sync --dev
 
 # Run the CLI locally
-uv run repomind install
-uv run repomind
+uv run zeocloud install
+uv run zeocloud
 ```
 
 ---
@@ -49,10 +49,10 @@ All four must pass before opening a PR. CI runs all of them on Python 3.11 and 3
 src/
   cli/
     main.py          ← Typer app, commands: install / status / (default)
-    install.py       ← repomind install wizard
+    install.py       ← zeocloud install wizard
     chat.py          ← Interactive Q&A loop
   config/
-    settings.py      ← RepoMindConfig Pydantic model, load/save
+    settings.py      ← ZeocloudConfig Pydantic model, load/save
   llm/
     ollama.py        ← httpx client for Ollama REST API
   embedder/
@@ -122,12 +122,12 @@ No other changes needed — the chunker and embedder are language-agnostic.
 - **Multiple embed models**: let users choose embed model at install (instead of always `nomic-embed-text`)
 - **Export session to HTML**: pretty-print Q&A sessions as a shareable HTML file
 - **Project diff detection**: detect when source files changed and suggest re-indexing
-- **Shell completion**: improve the auto-complete experience for `repomind` subcommands
+- **Shell completion**: improve the auto-complete experience for `zeocloud` subcommands
 
 ---
 
 ## Reporting Bugs
 
-Open an issue at https://github.com/manishdashsharma/RepoMind/issues
+Open an issue at https://github.com/manishdashsharma/Zeocloud/issues
 
-Include `repomind status` output and the full error message.
+Include `zeocloud status` output and the full error message.

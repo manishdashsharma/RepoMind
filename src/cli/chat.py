@@ -6,13 +6,13 @@ from pathlib import Path
 import typer
 from rich.markdown import Markdown
 
-from repomind.config.settings import ProjectEntry, RepoMindConfig, load_config, save_config
-from repomind.embedder.embed import EmbedClient
-from repomind.indexer.indexer import count_indexable_files, index_repository
-from repomind.llm.ollama import LLMClient
-from repomind.retriever.pipeline import RAGPipeline
-from repomind.retriever.qdrant import VectorStore
-from repomind.utils.display import (
+from zeocloud.config.settings import ProjectEntry, ZeocloudConfig, load_config, save_config
+from zeocloud.embedder.embed import EmbedClient
+from zeocloud.indexer.indexer import count_indexable_files, index_repository
+from zeocloud.llm.ollama import LLMClient
+from zeocloud.retriever.pipeline import RAGPipeline
+from zeocloud.retriever.qdrant import VectorStore
+from zeocloud.utils.display import (
     console,
     error,
     info,
@@ -24,15 +24,15 @@ from repomind.utils.display import (
     success,
     warning,
 )
-from repomind.utils.safety import validate_question, validate_repo_path
-from repomind.utils.session import SessionData, save_session
+from zeocloud.utils.safety import validate_question, validate_repo_path
+from zeocloud.utils.session import SessionData, save_session
 
 
 def run_chat(agent_name: str) -> None:
     config = load_config()
 
     if not config.installed:
-        error("RepoMind is not set up. Run [bold]repomind install[/bold] first.")
+        error("Zeocloud is not set up. Run [bold]zeocloud install[/bold] first.")
         raise typer.Exit(1)
 
     llm = LLMClient(host=config.ollama_host)
@@ -44,7 +44,7 @@ def run_chat(agent_name: str) -> None:
         raise typer.Exit(1)
 
     if not store.is_healthy():
-        error("Qdrant is not running. Start it with [bold]repomind install[/bold].")
+        error("Qdrant is not running. Start it with [bold]zeocloud install[/bold].")
         raise typer.Exit(1)
 
     rag = RAGPipeline(llm, embedder, store, config.model, agent_name=agent_name)
@@ -93,7 +93,7 @@ def _show_menu(agent_name: str) -> None:
 
 
 def _ask_flow(
-    config: RepoMindConfig,
+    config: ZeocloudConfig,
     rag: RAGPipeline,
     agent_name: str,
     session: SessionData,
@@ -160,7 +160,7 @@ def _ask_flow(
 
 
 def _index_flow(
-    config: RepoMindConfig,
+    config: ZeocloudConfig,
     llm: LLMClient,
     embedder: EmbedClient,
     store: VectorStore,
@@ -177,7 +177,7 @@ def _index_flow(
         return
 
     panel(
-        f"  [bold]RepoMind will:[/bold]\n\n"
+        f"  [bold]Zeocloud will:[/bold]\n\n"
         f"  [primary]1.[/primary] Read source files from:\n"
         f"      [bold]{repo_path}[/bold]\n\n"
         f"  [primary]2.[/primary] Chunk and embed them locally via Ollama\n\n"
@@ -253,7 +253,7 @@ def _index_flow(
     success(f"[bold]{project_name}[/bold] — {file_count} files, {len(all_chunks)} chunks indexed")
 
 
-def _list_flow(config: RepoMindConfig) -> None:
+def _list_flow(config: ZeocloudConfig) -> None:
     section("Indexed Projects")
 
     if not config.projects:
@@ -283,7 +283,7 @@ def _list_flow(config: RepoMindConfig) -> None:
     console.print(table)
 
 
-def _delete_flow(config: RepoMindConfig, store: VectorStore) -> None:
+def _delete_flow(config: ZeocloudConfig, store: VectorStore) -> None:
     section("Remove Project")
 
     if not config.projects:

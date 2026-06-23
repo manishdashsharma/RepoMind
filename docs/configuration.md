@@ -1,13 +1,13 @@
-# RepoMind — Configuration Reference
+# Zeocloud — Configuration Reference
 
-All configuration is stored at `~/.repomind/config.json`. It is created automatically during `repomind install` and updated whenever you index a project or rename your agent.
+All configuration is stored at `~/.zeocloud/config.json`. It is created automatically during `zeocloud install` and updated whenever you index a project or rename your agent.
 
 ---
 
 ## Config File Location
 
 ```
-~/.repomind/
+~/.zeocloud/
   config.json          ← main config
   sessions/            ← Q&A session logs (one .md per session)
   docker/
@@ -43,13 +43,13 @@ All configuration is stored at `~/.repomind/config.json`. It is created automati
 
 | Field | Default | Description |
 |---|---|---|
-| `agent_name` | `null` | Name of your AI agent. Set on first `repomind` run. |
+| `agent_name` | `null` | Name of your AI agent. Set on first `zeocloud` run. |
 | `model` | `"llama3.2:3b"` | Ollama model used for answer generation. |
 | `embed_model` | `"nomic-embed-text"` | Ollama model used for embeddings. Do not change unless you re-index all projects. |
 | `ollama_host` | `"http://localhost:11434"` | Ollama API base URL. Change if you run Ollama on a custom port. |
 | `qdrant_host` | `"localhost"` | Qdrant host. |
 | `qdrant_port` | `6333` | Qdrant REST API port. |
-| `installed` | `false` | Set to `true` after `repomind install` completes. |
+| `installed` | `false` | Set to `true` after `zeocloud install` completes. |
 | `projects` | `{}` | Map of indexed projects keyed by project name. |
 
 ---
@@ -59,7 +59,7 @@ All configuration is stored at `~/.repomind/config.json`. It is created automati
 After install, you can switch models without reinstalling:
 
 1. Pull the new model: `ollama pull llama3.3:70b`
-2. Edit `~/.repomind/config.json` and update the `model` field.
+2. Edit `~/.zeocloud/config.json` and update the `model` field.
 3. Re-index your projects (the embedding model stays the same — no re-indexing needed unless you change `embed_model`).
 
 **Warning:** If you change `embed_model`, all Qdrant collections are incompatible with the new embedding dimensions. You must remove and re-index all projects.
@@ -81,13 +81,13 @@ Hindi language responses work best with `llama3.1:8b` or higher.
 
 ## Qdrant Collections
 
-Each indexed project gets its own Qdrant collection named `repomind_{project_name}`. You can inspect them at:
+Each indexed project gets its own Qdrant collection named `zeocloud_{project_name}`. You can inspect them at:
 
 ```
 http://localhost:6333/dashboard
 ```
 
-Collections persist across restarts because Qdrant uses a named Docker volume (`repomind_qdrant_data`).
+Collections persist across restarts because Qdrant uses a named Docker volume (`zeocloud_qdrant_data`).
 
 ---
 
@@ -95,11 +95,11 @@ Collections persist across restarts because Qdrant uses a named Docker volume (`
 
 ```bash
 # Remove all indexed data
-docker volume rm repomind_qdrant_data
+docker volume rm zeocloud_qdrant_data
 
 # Remove config
-rm ~/.repomind/config.json
+rm ~/.zeocloud/config.json
 
 # Start fresh
-repomind install
+zeocloud install
 ```

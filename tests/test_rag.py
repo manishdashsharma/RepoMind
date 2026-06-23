@@ -2,8 +2,8 @@ from __future__ import annotations
 
 from unittest.mock import MagicMock
 
-from repomind.retriever.pipeline import RAGPipeline
-from repomind.retriever.qdrant import SearchResult
+from zeocloud.retriever.pipeline import RAGPipeline
+from zeocloud.retriever.qdrant import SearchResult
 
 
 def _make_result(file: str = "app.py", score: float = 0.9) -> SearchResult:
